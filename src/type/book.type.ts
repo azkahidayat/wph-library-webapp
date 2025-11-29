@@ -1,3 +1,12 @@
+import type { ApiResponse, Pagination } from './api.type';
+import type { Author } from './author.type';
+
+export type BookRecomendationParams = {
+  by?: 'rating' | 'popular'; // default: rating
+  categoryId?: number;
+  limit?: number; // default: 10
+};
+
 export type BookSearchParams = {
   /** Search by title or keyword */
   q?: string;
@@ -13,14 +22,6 @@ export type BookSearchParams = {
 
   /** Number of items per page */
   limit?: number;
-};
-
-export type BookAuthor = {
-  id: number;
-  name: string;
-  bio: string;
-  createdAt: string;
-  updatedAt: string;
 };
 
 export type BookCategory = {
@@ -46,22 +47,37 @@ export type Book = {
   categoryId: number;
   createdAt: string;
   updatedAt: string;
-  author: BookAuthor;
+  author: Author;
   category: BookCategory;
 };
 
-export type BookPagination = {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
+export type BookListResponse = ApiResponse<{
+  books: Book[];
+  pagination: Pagination;
+}>;
+
+export type BookRecomendationData = {
+  mode: 'rating' | 'popular';
+  books: Book[];
 };
 
-export type BookListResponse = {
+export type BookRecomendationResponse = {
   success: boolean;
   message: string;
-  data: {
-    books: Book[];
-    pagination: BookPagination;
-  };
+  data: BookRecomendationData;
 };
+
+export type BookDetail = Book & {
+  reviews: Array<{
+    id: number;
+    star: number;
+    comment: string;
+    createdAt: string;
+    user: {
+      id: number;
+      name: string;
+    };
+  }>;
+};
+
+export type BookDetailApiResponse = ApiResponse<BookDetail>;

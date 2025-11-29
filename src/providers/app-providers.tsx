@@ -1,15 +1,31 @@
 import { store } from '@/store';
 import { setCredentials } from '@/store/slices';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
-import { Toaster } from 'sonner';
+import { toast, Toaster } from 'sonner';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 type Props = {
   children: React.ReactNode;
 };
 
 const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  }),
   defaultOptions: {
     queries: {
       retry: false,
@@ -44,6 +60,7 @@ const AppProvider = ({ children }: Props) => {
         {children}
 
         <Toaster richColors position='top-right' />
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </ReduxProvider>
   );
