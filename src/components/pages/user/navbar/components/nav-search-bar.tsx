@@ -1,21 +1,26 @@
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Search } from 'lucide-react';
+import type { ComponentProps } from 'react';
 
-interface SearchBarProps {
+type SearchBarProps = {
   isLoggedIn: boolean;
   isSearchOpen: boolean;
-}
+  className?: string;
+} & ComponentProps<'input'>;
 
 export const SearchBar: React.FC<SearchBarProps> = ({
   isLoggedIn,
   isSearchOpen,
+  className,
+  ...props
 }) => (
   <div
     className={cn(
       'relative flex-1 max-w-[500px]',
       isLoggedIn && !isSearchOpen ? 'hidden md:flex' : 'hidden',
-      isSearchOpen && 'block'
+      isSearchOpen && 'block',
+      className
     )}
   >
     <span className='absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600 '>
@@ -25,6 +30,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       name='search'
       className='rounded-full h-10 md:h-11 pl-10'
       placeholder='Search book'
+      {...props}
     ></Input>
   </div>
 );

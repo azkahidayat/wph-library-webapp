@@ -12,7 +12,7 @@ import {
 } from '@/components/pages/auth';
 import { loginSection, loginFields } from '../auth.constants';
 import { useNavigate } from 'react-router-dom';
-import { HOME_PATH } from '@/lib/constants';
+import { getDefaultRouteForRole } from '@/routes/protected-route';
 
 const Login = () => {
   const login = useLogin();
@@ -27,7 +27,15 @@ const Login = () => {
   });
 
   const onSubmit: SubmitHandler<LoginRequest> = (val) => {
-    login.mutate(val, { onSuccess: () => navigate(HOME_PATH) });
+    login.mutate(val, {
+      onSuccess: (data) => {
+        const userRole = data.data.user.role;
+
+        const defaultRoute = getDefaultRouteForRole(userRole);
+
+        navigate(defaultRoute, { replace: true });
+      },
+    });
   };
 
   return (
@@ -37,7 +45,6 @@ const Login = () => {
           {loginFields.map((item) => (
             <FormFields key={item.name} control={form.control} config={item} />
           ))}
-
           <Button type='submit' widthFull>
             {login.isPending ? (
               <TextLoading> Logging in...</TextLoading>

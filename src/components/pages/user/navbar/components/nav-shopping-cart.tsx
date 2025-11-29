@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartCount } from '@/hooks';
-import { CART_PATH } from '@/lib/constants';
+import { CART_PATH } from '@/constants/base.constants';
 import { cn } from '@/lib/utils';
 import { Handbag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -8,9 +8,13 @@ import { useState, useEffect } from 'react';
 
 type ShoppingCartProps = {
   isLoggedIn: boolean;
+  className?: string;
 };
 
-export const ShoppingCart: React.FC<ShoppingCartProps> = ({ isLoggedIn }) => {
+export const ShoppingCart: React.FC<ShoppingCartProps> = ({
+  isLoggedIn,
+  className,
+}) => {
   const navigate = useNavigate();
   const { count } = useCartCount();
   const [prevCount, setPrevCount] = useState(count);
@@ -28,7 +32,8 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({ isLoggedIn }) => {
     <div
       className={cn(
         'relative flex-center cursor-pointer',
-        !isLoggedIn && 'md:hidden'
+        !isLoggedIn && 'md:hidden',
+        className
       )}
       onClick={() => navigate(CART_PATH)}
     >

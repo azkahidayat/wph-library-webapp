@@ -8,17 +8,18 @@ import {
   SearchInputWrapper,
 } from '@/components/container/search-input';
 import {
-  EmptyLoans,
   FilterBadge,
   FilterBadgeItem,
   LoansCard,
   LoansCardItem,
   LoansCardSkeleton,
-} from './components';
-import { STATUS_OPTIONS } from './borrowed-list.constants';
+} from '@/components/pages/borrowed';
+import { STATUS_OPTIONS } from '@/components/pages/borrowed/borrowed-list.constants';
 import React from 'react';
 import type { GetLoansParams, LoanStatus } from '@/type';
 import { useLoans } from '@/hooks';
+import { EmptyState } from '@/components/container/empty-state';
+import { EMPTY_LOANS_DATA } from '@/constants';
 
 const BorrowedList = () => {
   const [params, setParams] = React.useState<GetLoansParams>({
@@ -70,7 +71,7 @@ const BorrowedList = () => {
           skeletonCount={params.limit}
           Skeleton={LoansCardSkeleton}
           data={loans}
-          fallback={<EmptyLoans />}
+          fallback={<EmptyState data={EMPTY_LOANS_DATA} />}
         >
           {(loan) => <LoansCardItem key={loan.id} loan={loan} />}
         </QueryStateComp>

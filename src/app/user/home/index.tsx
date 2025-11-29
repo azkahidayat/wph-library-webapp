@@ -13,17 +13,13 @@ import {
   QueryStateComp,
   SectionWrapper,
 } from '@/components/container';
-import type { BookSearchParams } from '@/type';
-import React from 'react';
 import { useAuthors } from '@/hooks/use-author';
 import { BookInfiniteList } from '@/components/container/book-infinite-list';
+import { useParamsSearchBooks } from '@/hooks/use-params-search-book';
 
 const Home = () => {
-  const limit = 10;
-  const [params] = React.useState<BookSearchParams>({ limit });
-
+  const { params } = useParamsSearchBooks();
   const { data: authorsData, isLoading: isAuthorLoading } = useAuthors();
-
   const authors = authorsData?.data.authors ?? [];
 
   return (

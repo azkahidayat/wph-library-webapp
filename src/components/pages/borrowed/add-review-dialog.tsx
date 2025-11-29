@@ -1,4 +1,3 @@
-// components/ReviewDialog.tsx
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -60,8 +59,8 @@ export const ReviewDialog = ({ bookId, trigger }: ReviewDialogProps) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
 
-      <DialogContent className='sm:max-w-[425px] md:min-w-[438px]'>
-        <DialogHeader>
+      <DialogContent className='sm:max-w-[425px] md:min-w-[438px] space-y-6'>
+        <DialogHeader className='px-0'>
           <DialogTitle>Give Review</DialogTitle>
         </DialogHeader>
 
@@ -92,7 +91,7 @@ export const ReviewDialog = ({ bookId, trigger }: ReviewDialogProps) => {
               setError({});
             }}
             placeholder='Please share your thoughts about this book'
-            className='w-full min-h-[200px]'
+            className='w-full min-h-[200px] max-h-96 resize-none overflow-y-auto'
           />
           {error.comment && (
             <p className='text-sm text-destructive'>{error.comment}</p>

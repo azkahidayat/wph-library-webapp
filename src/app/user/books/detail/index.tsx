@@ -1,17 +1,15 @@
-import { useBook, useBooksInfinite } from '@/hooks';
-import { useParams } from 'react-router-dom';
+import { useAddToCart, useBook, useBooksInfinite } from '@/hooks';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
-  BookDesc,
-  BookImage,
-  BookInfo,
-  BookStats,
+  BookDetails,
   BreadcrumbsDetail,
-} from './components/book-detail';
+} from '@/components/pages/book/book-detail';
 import { Hr } from '@/components/ui/hr';
 import {
   BookCard,
   BookCardSkeleton,
   BooksList,
+  EmptyState,
   QueryStateComp,
   SectionWrapper,
   StarrRating,
@@ -20,57 +18,62 @@ import { ReviewItem, ReviewList } from './components/review';
 import { Button } from '@/components/ui/button';
 import type { BookSearchParams } from '@/type';
 import React from 'react';
-import ButtonActions from './components/button-actions';
+import {
+  AddToCartBtn,
+  BorrowBookBtn,
+  ButtonActions,
+} from './components/button-actions';
 import DetailInfoLoading from './components/loading/detail-info-skeleton';
+import {
+  CHECKOUT_PATH,
+  EMPTY_BOOKS_DATA,
+  EMPTY_REVIEWS_DATA,
+} from '@/constants';
+import BookDetailNotFound from './components/not-found';
+import { useAppDispatch } from '@/store';
+import { setBookLoansItems } from '@/store/slices';
 
 const BooksDetail = () => {
   const { id } = useParams();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const { data, isLoading: isBookLoading } = useBook(Number(id));
-  const limit = 5;
-  const [params] = React.useState<BookSearchParams>({ limit });
+  const [params] = React.useState<BookSearchParams>({ limit: 5 });
   const { data: booksData, isLoading: isBooksLoading } =
     useBooksInfinite(params);
 
   const book = data?.data;
   const books = booksData?.pages.flatMap((res) => res.data.books);
 
-  if (isBookLoading) {
-    return <DetailInfoLoading />;
-  }
+  const addCart = useAddToCart();
+  const req = { bookId: Number(id), qty: 1 };
+  const handleAddToCart = () => addCart.mutate(req);
 
-  if (!book) {
-    return (
-      <div className='base-container'>
-        <p>Book not found</p>
-      </div>
-    );
-  }
+  if (isBookLoading) return <DetailInfoLoading />;
+  if (!book) return <BookDetailNotFound />;
+  const { title, rating, Review } = book;
 
-  const { description, title, coverImage, Category, Author, rating, Review } =
-    book;
-
+  const onBorrowClick = () => {
+    dispatch(setBookLoansItems({ datas: [book], duration: null }));
+    navigate(CHECKOUT_PATH);
+  };
   return (
     <div className='base-container'>
       <section className='flex-col-start gap-4 md:gap-6 w-full'>
         <BreadcrumbsDetail book={title} />
-        <div className='flex flex-col md:flex-row md:mx-0 gap-8'>
-          <div className='flex-center'>
-            <BookImage coverImage={coverImage} />
-          </div>
-          <div className='flex-col-start flex-1 gap-4 md:gap-5'>
-            <div className='space-y-3 md:space-y-[22px]'>
-              <BookInfo
-                author={Author?.name || 'Unknown'}
-                categoryName={Category.name}
-                bookTitle={title}
-                rating={rating}
-              />
-              <BookStats book={book} />
-              <BookDesc desc={description} />
-            </div>
-            <ButtonActions />
-          </div>
-        </div>
+        <BookDetails book={book}>
+          <ButtonActions className='hidden md:flex'>
+            <AddToCartBtn
+              isPending={addCart.isPending}
+              onClick={handleAddToCart}
+              disabled={addCart.isPending}
+            >
+              {addCart.isPending ? 'Adding...' : 'Add To Cart'}
+            </AddToCartBtn>
+            <BorrowBookBtn onClick={onBorrowClick}>Borrow Book</BorrowBookBtn>
+          </ButtonActions>
+        </BookDetails>
       </section>
       <Hr />
       <SectionWrapper
@@ -81,14 +84,21 @@ const BooksDetail = () => {
           </StarrRating>
         }
       >
-        <ReviewList>
-          {Review?.map((review) => (
-            <ReviewItem key={review.id} review={review} />
-          ))}
-        </ReviewList>
-        <div className='w-full flex-center'>
-          <Button variant={'outline'}>Load More</Button>
-        </div>
+        {!Review.length && Review.length === 0 ? (
+          <EmptyState data={EMPTY_REVIEWS_DATA} />
+        ) : (
+          <div className='flex flex-col gap-10'>
+            <ReviewList>
+              {Review?.map((review) => (
+                <ReviewItem key={review.id} review={review} />
+              ))}
+            </ReviewList>
+            <Button className='self-center' variant={'outline'}>
+              Load More
+            </Button>
+          </div>
+        )}
+        <div className='w-full flex-center'></div>
       </SectionWrapper>
       <Hr />
       <SectionWrapper title='Related Books'>
@@ -97,11 +107,12 @@ const BooksDetail = () => {
             isLoading={isBooksLoading}
             skeleton={
               <>
-                {Array.from({ length: limit }).map((_, idx) => (
+                {Array.from({ length: params.limit ?? 5 }).map((_, idx) => (
                   <BookCardSkeleton key={idx} />
                 ))}
               </>
             }
+            fallback={<EmptyState data={EMPTY_BOOKS_DATA} />}
           >
             {books?.map((book) => (
               <BookCard book={book} key={book.id} />
@@ -110,7 +121,16 @@ const BooksDetail = () => {
         </BooksList>
       </SectionWrapper>
 
-      <ButtonActions isMobile />
+      <ButtonActions isMobile>
+        <AddToCartBtn
+          isPending={addCart.isPending}
+          onClick={handleAddToCart}
+          disabled={addCart.isPending}
+        >
+          {addCart.isPending ? 'Adding...' : 'Add To Cart'}
+        </AddToCartBtn>
+        <BorrowBookBtn onClick={onBorrowClick}>Borrow Book</BorrowBookBtn>
+      </ButtonActions>
     </div>
   );
 };

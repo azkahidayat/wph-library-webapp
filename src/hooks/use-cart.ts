@@ -1,18 +1,24 @@
 import { cartService } from '@/service';
+import type { RootState } from '@/store';
 import type { AddCartReq, ApiResponse, CartData, CartItem } from '@/type';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
+import { toast } from 'sonner';
 
 export const cartKeys = {
   getAll: ['cart', 'all'] as const,
 };
 
 export const useCart = () => {
+  const token = useSelector((state: RootState) => state.auth.token);
+
   return useQuery<CartData>({
     queryKey: cartKeys.getAll,
     queryFn: async () => {
       const response = await cartService.getAll();
       return response.data.data;
     },
+    enabled: !!token,
     placeholderData: {
       cartId: 0,
       items: [],
@@ -26,7 +32,6 @@ export const useCartCount = () => {
   const { data, isLoading } = useCart();
 
   const count = data?.items.reduce((total, item) => total + item.qty, 0) ?? 0;
-
   return { count, isLoading };
 };
 
@@ -85,15 +90,14 @@ export const useAddToCart = () => {
     },
 
     onError: (_, __, context) => {
-      // Rollback on error
       if (context?.prevData) {
         queryClient.setQueryData(cartKeys.getAll, context.prevData);
       }
     },
 
     onSuccess: () => {
-      // Refetch to get server state
       queryClient.invalidateQueries({ queryKey: cartKeys.getAll });
+      toast.success('added to cart');
     },
   });
 };

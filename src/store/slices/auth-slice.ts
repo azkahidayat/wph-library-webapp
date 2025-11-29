@@ -1,14 +1,16 @@
-import type { AuthUser } from '@/type';
+import type { MeResponseData } from '@/type';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 type AuthState = {
   token: string | null;
-  user: AuthUser | null;
+  user: MeResponseData | null;
+  isHydrated: boolean;
 };
 
 const initialState: AuthState = {
   token: null,
   user: null,
+  isHydrated: false,
 };
 
 export const authSlice = createSlice({
@@ -17,10 +19,11 @@ export const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ token: string; user: AuthUser }>
+      action: PayloadAction<{ token: string; user: MeResponseData }>
     ) => {
       state.token = action.payload.token;
       state.user = action.payload.user;
+      state.isHydrated = true;
     },
     setToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
@@ -28,11 +31,16 @@ export const authSlice = createSlice({
     clearAuth: (state) => {
       state.token = null;
       state.user = null;
+      state.isHydrated = true;
+    },
+    setHydrated: (state) => {
+      state.isHydrated = true;
     },
   },
 });
 
-export const { setCredentials, setToken, clearAuth } = authSlice.actions;
+export const { setCredentials, setToken, clearAuth, setHydrated } =
+  authSlice.actions;
 
 const authReducer = authSlice.reducer;
 export default authReducer;

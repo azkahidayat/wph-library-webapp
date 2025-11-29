@@ -19,8 +19,14 @@ export const meKeys = {
   review: (params?: GetReviewParams) => ['me', 'reviews', params],
 };
 
-export const useMe = () =>
-  useQuery({ queryKey: meKeys.get, queryFn: meService.me });
+export const useMe = (options?: { enabled?: boolean }) => {
+  return useQuery({
+    queryKey: meKeys.get,
+    queryFn: meService.me,
+    enabled: options?.enabled !== undefined ? options.enabled : true,
+    ...options,
+  });
+};
 
 export const useUpdateMe = () => {
   const queryClient = useQueryClient();
@@ -61,6 +67,20 @@ export const useUpdateMe = () => {
 
     onSuccess: (response) => {
       queryClient.setQueryData(['me'], response);
+
+      queryClient.invalidateQueries({ queryKey: ['me'] });
+      queryClient.invalidateQueries({
+        queryKey: ['users'],
+      });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          query.queryKey[0] === 'me' ||
+          query.queryKey.includes('user') ||
+          query.queryKey.includes('profile') ||
+          query.queryKey.includes('admin') ||
+          query.queryKey.includes('auth'),
+      });
+
       toast.success('Name updated successfully!');
     },
 
