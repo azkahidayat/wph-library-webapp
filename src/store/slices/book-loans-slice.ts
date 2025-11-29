@@ -1,8 +1,8 @@
-import type { BookDetail, CartItemList } from '@/type';
+import type { CartItemList } from '@/type';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 export type BookLoansState = {
-  datas: (CartItemList | BookDetail)[];
+  datas: CartItemList[];
   duration: number | null;
 };
 
@@ -18,7 +18,7 @@ export const bookLoansSlice = createSlice({
   name: 'book-loans',
   initialState,
   reducers: {
-    addBook: (state, action: PayloadAction<CartItemList | BookDetail>) => {
+    addBook: (state, action: PayloadAction<CartItemList>) => {
       state.datas.push(action.payload);
       saveToLocalStorage(state.datas);
     },
@@ -32,10 +32,7 @@ export const bookLoansSlice = createSlice({
 
     setBookLoansItems: (
       state,
-      action: PayloadAction<{
-        datas: (CartItemList | BookDetail)[];
-        duration: number | null;
-      }>
+      action: PayloadAction<{ datas: CartItemList[]; duration: number | null }>
     ) => {
       state.datas = action.payload.datas;
       state.duration = action.payload.duration;
@@ -44,7 +41,7 @@ export const bookLoansSlice = createSlice({
   },
 });
 
-const saveToLocalStorage = (books: (CartItemList | BookDetail)[]) => {
+const saveToLocalStorage = (books: CartItemList[]) => {
   if (typeof window !== 'undefined') {
     localStorage.setItem('book-loans', JSON.stringify(books));
   }

@@ -22,7 +22,7 @@ export const useBorrowCheckout = (loansData: any[]) => {
 
     const requests = loansData.map((item) => ({
       bookId: item.bookId || item.id,
-      qty: item.qty ?? 1,
+      qty: item.qty,
     }));
 
     const cartItemIds = loansData
