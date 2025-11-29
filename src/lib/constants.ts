@@ -21,9 +21,17 @@ export const IMAGES = {
   },
 };
 
+export const BOOK_PATH = {
+  INDEX: '/books',
+};
+
 export const AUTH_PATH = {
   LOGIN: '/auth/login',
   REGISTER: '/auth/register',
+};
+
+export const AUTHOR_PATH = {
+  INDEX: '/author',
 };
 
 export const HOME_PATH = '/';

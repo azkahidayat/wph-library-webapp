@@ -6,6 +6,13 @@ import Register from './auth/register';
 import UserLayout from './user/layout';
 import Home from './user/home';
 import BooksDetail from './user/books/detail';
+import BooksList from './user/books/list';
+import Author from './user/author/id';
+import Cart from './user/cart';
+import Checkout from './user/checkout';
+import Profile from './user/profile';
+import Reviews from './user/reviews';
+import BorrowedList from './user/borrowed-list';
 
 function App() {
   return (
@@ -16,8 +23,23 @@ function App() {
             <Route index element={<Home />}></Route>
 
             <Route path='books'>
+              <Route index element={<BooksList />} />
               <Route path=':id' element={<BooksDetail />} />
             </Route>
+
+            <Route path='author'>
+              <Route path=':id' element={<Author />} />
+            </Route>
+            <Route path='profile' element={<Profile />} />
+
+            <Route path='cart' element={<Cart />} />
+            {/* chceckout and checkout success */}
+            <Route path='checkout' element={<Checkout />} />
+
+            {/* Posible deleted */}
+            <Route path='reviews' element={<Reviews />} />
+            <Route path='borrowed-list' element={<BorrowedList />} />
+            {/* Posible deleted */}
           </Route>
 
           <Route path='/auth' element={<AuthLayout />}>
